@@ -27,13 +27,74 @@ environment:
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
+name: zenbudget_mobile
+description: Personal budget management app
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
 dependencies:
   flutter:
     sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
+  # State Management
+  flutter_riverpod: ^2.5.0
+  riverpod_annotation: ^2.3.0
+
+  # Navigation
+  go_router: ^13.0.0
+
+  # Networking
+  dio: ^5.4.0
+  retrofit: ^4.1.0
+  json_annotation: ^4.8.0
+
+  # Local Storage
+  hive_flutter: ^1.1.0
+  flutter_secure_storage: ^9.0.0
+
+  # UI
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.0
+  shimmer: ^3.0.0
+
+  # Charts
+  fl_chart: ^0.66.0
+
+  # Firebase
+  firebase_core: ^2.24.0
+  firebase_auth: ^4.16.0
+  firebase_messaging: ^14.7.0
+  firebase_analytics: ^10.8.0
+
+  # Auth
+  google_sign_in: ^6.2.0
+  local_auth: ^2.1.0
+
+  # Utilities
+  intl: ^0.19.0
+  connectivity_plus: ^5.0.0
+  package_info_plus: ^5.0.0
+  url_launcher: ^6.2.0
+  share_plus: ^7.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.0
+  retrofit_generator: ^8.1.0
+  json_serializable: ^6.7.0
+  riverpod_generator: ^2.3.0
+  mockito: ^5.4.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
 
 dev_dependencies:
   flutter_test:
