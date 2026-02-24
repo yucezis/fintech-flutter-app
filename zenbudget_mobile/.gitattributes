@@ -1,0 +1,7 @@
+# GitHub'ın dil istatistiklerinde platform klasörlerini yok saymasını sağlar
+ios/* linguist-vendored
+android/* linguist-vendored
+macos/* linguist-vendored
+windows/* linguist-vendored
+linux/* linguist-vendored
+web/* linguist-vendored
