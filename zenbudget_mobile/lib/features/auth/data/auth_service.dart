@@ -14,10 +14,21 @@ class AuthService {
         data: {'email': email, 'password': password},
       );
 
-      final token = response.data['data']['token'];
-      await _storage.write(key: 'access_token', value: token);
-      return true;
+      print('DEBUG: Backendden gelen cevap: ${response.data}');
+
+      final token = (response.data['data'] != null) 
+          ? response.data['data']['token'] 
+          : response.data['token'];
+
+      if (token != null) {
+        await _storage.write(key: 'access_token', value: token.toString());
+        return true;
+      } else {
+        print('🔴 HATA: Cevap geldi ama içerisinde "token" bulunamadı!');
+        return false;
+      }
     } catch (e) {
+      print('🔴 GİRİŞ HATASI DETAYI: $e'); 
       return false; 
     }
   }
@@ -34,6 +45,7 @@ class AuthService {
       );
       return true;
     } catch (e) {
+      print('🔴 KAYIT HATASI DETAYI: $e');
       return false;
     }
   }
