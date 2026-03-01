@@ -14,48 +14,43 @@ class AuthService {
         data: {'email': email, 'password': password},
       );
 
-      print('DEBUG: Backendden gelen cevap: ${response.data}');
+      final data = response.data;
+      final accessToken = data['accessToken'] ?? data['token'];
+      final refreshToken = data['refreshToken'];
 
-      final token = (response.data['data'] != null) 
-          ? response.data['data']['token'] 
-          : response.data['token'];
-
-      if (token != null) {
-        await _storage.write(key: 'access_token', value: token.toString());
+      if (accessToken != null) {
+        await _storage.write(key: 'access_token', value: accessToken.toString());
+        if (refreshToken != null) {
+          await _storage.write(key: 'refresh_token', value: refreshToken.toString());
+        }
         return true;
-      } else {
-        print('🔴 HATA: Cevap geldi ama içerisinde "token" bulunamadı!');
-        return false;
       }
+      return false;
     } catch (e) {
-      print('🔴 GİRİŞ HATASI DETAYI: $e'); 
-      return false; 
+      print('🔴 GİRİŞ HATASI: $e');
+      return false;
     }
+  }
+
+  Future<void> logout() async {
+    await _storage.deleteAll();
+  }
+
+  Future<bool> isLoggedIn() async {
+    final token = await _storage.read(key: 'access_token');
+    return token != null;
   }
 
   Future<bool> register(String fullName, String email, String password) async {
     try {
       await _dio.post(
         '${ApiConstants.auth}/register',
-        data: {
-          'fullName': fullName,
-          'email': email,
-          'password': password,
-        },
+        data: {'fullName': fullName, 'email': email, 'password': password},
       );
       return true;
     } catch (e) {
-      print('🔴 KAYIT HATASI DETAYI: $e');
+      print('🔴 KAYIT HATASI: $e');
       return false;
     }
-  }
-
-  Future<void> logout() async {
-    await _storage.delete(key: 'access_token');
-  }
-
-  Future<bool> isLoggedIn() async {
-    final token = await _storage.read(key: 'access_token');
-    return token != null;
   }
 }

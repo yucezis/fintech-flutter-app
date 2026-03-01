@@ -45,7 +45,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(path: '/transactions', builder: (context, state) => const TransactionScreen()),
+              GoRoute(path: '/transactions', builder: (context, state) => const TransactionsScreen()),
             ],
           ),
           StatefulShellBranch(

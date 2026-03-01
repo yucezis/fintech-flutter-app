@@ -37,7 +37,6 @@ class MainLayout extends StatelessWidget {
   }
 }
 
-// ── Özel Bottom Nav ───────────────────────────────────────────
 class _ZenBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -121,7 +120,6 @@ class _ZenBottomNav extends StatelessWidget {
             children: List.generate(_items.length, (index) {
               final item = _items[index];
 
-              // Ortadaki Ekle butonu
               if (item.isCenter) {
                 return _CenterAddButton(
                   isActive: currentIndex == index,
@@ -142,7 +140,6 @@ class _ZenBottomNav extends StatelessWidget {
   }
 }
 
-// ── Normal nav butonu ─────────────────────────────────────────
 class _NavButton extends StatelessWidget {
   final _NavItem item;
   final bool isActive;
@@ -208,7 +205,6 @@ class _NavButton extends StatelessWidget {
   }
 }
 
-// ── Ortadaki + butonu ─────────────────────────────────────────
 class _CenterAddButton extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
@@ -279,7 +275,6 @@ class _CenterAddButton extends StatelessWidget {
   }
 }
 
-// ── Model ─────────────────────────────────────────────────────
 class _NavItem {
   final IconData icon;
   final IconData activeIcon;
