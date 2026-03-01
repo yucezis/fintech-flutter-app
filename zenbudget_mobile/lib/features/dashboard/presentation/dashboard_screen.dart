@@ -430,7 +430,7 @@ class _TransactionTile extends StatelessWidget {
   const _TransactionTile({required this.data});
 
   static const _ink      = Color(0xFF0A131F);
-  static const _cerulean = Color(0xFF457B9D);
+  //static const _cerulean = Color(0xFF457B9D);
   static const _red      = Color(0xFFE63946);
 
   String get _title =>
