@@ -8,35 +8,41 @@ import '../../auth/data/auth_provider.dart';
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
-  static const _red      = Color(0xFFE63946);
-  static const _cream    = Color(0xFFF1FAEE);
-  static const _frost    = Color(0xFFA8DADC);
-  static const _cerulean = Color(0xFF457B9D);
-  static const _ink      = Color(0xFF0A131F);
+  static const _bg            = Color(0xFF0D0F14);
+  //static const _surface       = Color(0xFF161A23);
+  static const _surfaceAlt    = Color(0xFF1E2330);
+  static const _border        = Color(0xFF252B3A);
+  static const _accentBlue    = Color(0xFF4F8EF7);
+  //static const _accentMint    = Color(0xFF00C896);
+  //static const _accentRose    = Color(0xFFFF5B6E);
+  //static const _accentAmber   = Color(0xFFFFB347);
+  static const _textPrimary   = Color(0xFFEEF0F6);
+  static const _textSecondary = Color(0xFF6B7591);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dashboardAsync = ref.watch(dashboardProvider);
 
     return Scaffold(
-      backgroundColor: _cream,
+      backgroundColor: _bg,
       body: dashboardAsync.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: _cerulean),
+          child: CircularProgressIndicator(color: _accentBlue),
         ),
         error: (e, _) => _ErrorView(
           message: e.toString(),
           onRetry: () => ref.refresh(dashboardProvider.future),
         ),
         data: (summary) => RefreshIndicator(
-          color: _cerulean,
+          color: _accentBlue,
+          backgroundColor: _surfaceAlt,
           onRefresh: () => ref.refresh(dashboardProvider.future),
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
-                expandedHeight: 300,
+                expandedHeight: 310,
                 pinned: true,
-                backgroundColor: _cerulean,
+                backgroundColor: _bg,
                 elevation: 0,
                 automaticallyImplyLeading: false,
                 flexibleSpace: FlexibleSpaceBar(
@@ -46,19 +52,23 @@ class DashboardScreen extends ConsumerWidget {
                 title: Row(
                   children: [
                     Container(
-                      width: 30, height: 30,
+                      width: 32,
+                      height: 32,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        gradient: const LinearGradient(
+                          colors: [_accentBlue, Color(0xFF7B6CF6)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.account_balance_wallet_rounded,
-                          color: _cerulean, size: 16,
-                        ),
+                      child: const Icon(
+                        Icons.account_balance_wallet_rounded,
+                        color: Colors.white,
+                        size: 16,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     RichText(
                       text: const TextSpan(
                         children: [
@@ -67,7 +77,7 @@ class DashboardScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                              color: _textPrimary,
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -76,7 +86,7 @@ class DashboardScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              color: _frost,
+                              color: _accentBlue,
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -86,25 +96,43 @@ class DashboardScreen extends ConsumerWidget {
                   ],
                 ),
                 actions: [
-                  IconButton(
-                    icon: const Icon(
+                  Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: _surfaceAlt,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _border),
+                    ),
+                    child: const Icon(
                       Icons.notifications_none_rounded,
-                      color: Colors.white,
+                      color: _textSecondary,
+                      size: 18,
                     ),
-                    onPressed: () {},
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.logout_rounded,
-                      color: Colors.white,
-                    ),
-                    onPressed: () async {
+                  GestureDetector(
+                    onTap: () async {
                       final service = ref.read(authServiceProvider);
                       await service.logout();
                       if (context.mounted) context.go('/login');
                     },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 16),
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: _surfaceAlt,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: _border),
+                      ),
+                      child: const Icon(
+                        Icons.logout_rounded,
+                        color: _textSecondary,
+                        size: 18,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 4),
                 ],
               ),
 
@@ -116,7 +144,6 @@ class DashboardScreen extends ConsumerWidget {
                     children: [
                       _QuickActions(),
                       const SizedBox(height: 28),
-
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -125,23 +152,18 @@ class DashboardScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: _ink,
+                              color: _textPrimary,
                               letterSpacing: -0.4,
                             ),
                           ),
-                          TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              foregroundColor: _cerulean,
-                              padding: EdgeInsets.zero,
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
+                          GestureDetector(
+                            onTap: () {},
                             child: const Text(
                               'Tümünü Gör →',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
+                                color: _accentBlue,
                               ),
                             ),
                           ),
@@ -171,21 +193,44 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: _red,
-        elevation: 6,
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('İşlem ekleme yakında!'),
-              backgroundColor: _cerulean,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+
+      floatingActionButton: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [_accentBlue, Color(0xFF7B6CF6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: _accentBlue.withOpacity(0.4),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
-          );
-        },
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('İşlem ekleme yakında!'),
+                  backgroundColor: _surfaceAlt,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+              );
+            },
+            child: const Icon(Icons.add_rounded,
+                color: Colors.white, size: 26),
+          ),
+        ),
       ),
     );
   }
@@ -195,53 +240,133 @@ class _HeroBand extends StatelessWidget {
   final DashboardSummary summary;
   const _HeroBand({required this.summary});
 
-  static const _cerulean = Color(0xFF457B9D);
-  static const _ink      = Color(0xFF0A131F);
+  static const _bg          = Color(0xFF0D0F14);
+  //static const _surface     = Color(0xFF161A23);
+  //static const _border      = Color(0xFF252B3A);
+  static const _accentBlue  = Color(0xFF4F8EF7);
+  static const _accentMint  = Color(0xFF00C896);
+  static const _accentRose  = Color(0xFFFF5B6E);
+  static const _textPrimary   = Color(0xFFEEF0F6);
+  static const _textSecondary = Color(0xFF6B7591);
 
   @override
   Widget build(BuildContext context) {
+    final isPositive = summary.netBalance >= 0;
+
     return Stack(
       children: [
-        Container(color: _cerulean),
+        Container(color: _bg),
 
         Positioned(
-          top: -40, right: -40,
-          child: Container(
-            width: 200, height: 200,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.07),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 60, left: -20,
-          child: Container(
-            width: 130, height: 130,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _ink.withOpacity(0.07),
-            ),
-          ),
-        ),
-
-        Positioned(
-          left: 24, right: 24, bottom: 32,
-          child: _SummaryCard(
-            income: summary.totalIncome,
-            expense: summary.totalExpense,
-            balance: summary.netBalance,
-          ),
-        ),
-
-        Positioned(
-          bottom: 0, left: 0, right: 0,
-          child: ClipPath(
-            clipper: _WaveClipper(),
+          top: 30,
+          left: 0,
+          right: 0,
+          child: Center(
             child: Container(
-              height: 32,
-              color: const Color(0xFFF1FAEE),
+              width: 260,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    _accentBlue.withOpacity(0.12),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
             ),
+          ),
+        ),
+
+        Positioned.fill(
+          child: Column(
+            children: [
+              const SizedBox(height: 88),
+
+              Text(
+                'Toplam Bakiye',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _textSecondary,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              Text(
+                '₺${summary.netBalance.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.w800,
+                  color: isPositive ? _textPrimary : _accentRose,
+                  letterSpacing: -2,
+                ),
+              ),
+              const SizedBox(height: 6),
+
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: (isPositive ? _accentMint : _accentRose)
+                      .withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: (isPositive ? _accentMint : _accentRose)
+                        .withOpacity(0.25),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isPositive
+                          ? Icons.trending_up_rounded
+                          : Icons.trending_down_rounded,
+                      size: 12,
+                      color: isPositive ? _accentMint : _accentRose,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      isPositive ? 'Pozitif bakiye' : 'Negatif bakiye',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: isPositive ? _accentMint : _accentRose,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _StatCard(
+                        label: 'Gelir',
+                        amount: summary.totalIncome,
+                        icon: Icons.arrow_downward_rounded,
+                        color: _accentMint,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _StatCard(
+                        label: 'Gider',
+                        amount: summary.totalExpense,
+                        icon: Icons.arrow_upward_rounded,
+                        color: _accentRose,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -249,68 +374,63 @@ class _HeroBand extends StatelessWidget {
   }
 }
 
-class _SummaryCard extends StatelessWidget {
-  final double income;
-  final double expense;
-  final double balance;
+class _StatCard extends StatelessWidget {
+  final String label;
+  final double amount;
+  final IconData icon;
+  final Color color;
 
-  const _SummaryCard({
-    required this.income,
-    required this.expense,
-    required this.balance,
+  const _StatCard({
+    required this.label,
+    required this.amount,
+    required this.icon,
+    required this.color,
   });
+
+  static const _surface       = Color(0xFF161A23);
+  static const _border        = Color(0xFF252B3A);
+  static const _textPrimary   = Color(0xFFEEF0F6);
+  static const _textSecondary = Color(0xFF6B7591);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withOpacity(0.25)),
+        color: _surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _border),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            'TOPLAM BAKİYE',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: Colors.white.withOpacity(0.7),
-              letterSpacing: 1.2,
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Icon(icon, color: color, size: 16),
           ),
-          const SizedBox(height: 6),
-          Text(
-            '₺${balance.toStringAsFixed(2)}',
-            style: const TextStyle(
-              fontSize: 34,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              letterSpacing: -1,
-            ),
-          ),
-          const SizedBox(height: 18),
-          Row(
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _StatChip(
-                  label: 'GELİR',
-                  amount: income,
-                  isIncome: true,
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: _textSecondary,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              Container(
-                width: 1, height: 32,
-                color: Colors.white.withOpacity(0.2),
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-              ),
-              Expanded(
-                child: _StatChip(
-                  label: 'GİDER',
-                  amount: expense,
-                  isIncome: false,
+              const SizedBox(height: 2),
+              Text(
+                '₺${amount.toStringAsFixed(0)}',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: _textPrimary,
                 ),
               ),
             ],
@@ -321,71 +441,22 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-class _StatChip extends StatelessWidget {
-  final String label;
-  final double amount;
-  final bool isIncome;
-
-  const _StatChip({
-    required this.label,
-    required this.amount,
-    required this.isIncome,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(
-              isIncome
-                  ? Icons.arrow_downward_rounded
-                  : Icons.arrow_upward_rounded,
-              color: isIncome
-                  ? const Color(0xFF2EC071)
-                  : const Color(0xFFE63946),
-              size: 14,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                color: Colors.white.withOpacity(0.7),
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.8,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '₺${amount.toStringAsFixed(2)}',
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _QuickActions extends StatelessWidget {
-  static const _cerulean = Color(0xFF457B9D);
-  static const _red      = Color(0xFFE63946);
-  static const _ink      = Color(0xFF0A131F);
+  static const _accentBlue  = Color(0xFF4F8EF7);
+  static const _accentMint  = Color(0xFF00C896);
+  static const _accentRose  = Color(0xFFFF5B6E);
+  static const _accentAmber = Color(0xFFFFB347);
+  static const _surface     = Color(0xFF161A23);
+  static const _border      = Color(0xFF252B3A);
+  static const _textSecondary = Color(0xFF6B7591);
 
   @override
   Widget build(BuildContext context) {
     final actions = [
-      (Icons.add_rounded,          'Ekle',     _red),
-      (Icons.swap_horiz_rounded,   'Transfer', _cerulean),
-      (Icons.bar_chart_rounded,    'Rapor',    const Color(0xFF2EC071)),
-      (Icons.category_rounded,     'Kategori', const Color(0xFFFF9F1C)),
+      (Icons.add_rounded,        'Ekle',     _accentRose),
+      (Icons.swap_horiz_rounded, 'Transfer', _accentBlue),
+      (Icons.bar_chart_rounded,  'Rapor',    _accentMint),
+      (Icons.category_rounded,   'Kategori', _accentAmber),
     ];
 
     return Row(
@@ -397,24 +468,22 @@ class _QuickActions extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                width: 56, height: 56,
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: color.withOpacity(0.2),
-                    width: 1.5,
-                  ),
+                  color: _surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: _border),
                 ),
                 child: Icon(icon, color: color, size: 24),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: _ink.withOpacity(0.5),
+                  color: _textSecondary,
                 ),
               ),
             ],
@@ -429,9 +498,12 @@ class _TransactionTile extends StatelessWidget {
   final dynamic data;
   const _TransactionTile({required this.data});
 
-  static const _ink      = Color(0xFF0A131F);
-  //static const _cerulean = Color(0xFF457B9D);
-  static const _red      = Color(0xFFE63946);
+  static const _surface       = Color(0xFF161A23);
+  static const _border        = Color(0xFF252B3A);
+  static const _accentMint    = Color(0xFF00C896);
+  static const _accentRose    = Color(0xFFFF5B6E);
+  static const _textPrimary   = Color(0xFFEEF0F6);
+  static const _textSecondary = Color(0xFF6B7591);
 
   String get _title =>
       (data['title'] ?? data['description'] ?? data['name'] ?? 'İşlem')
@@ -473,39 +545,32 @@ class _TransactionTile extends StatelessWidget {
       return Icons.favorite_rounded;
     } else if (cat.contains('income') || cat.contains('gelir')) {
       return Icons.account_balance_rounded;
-    } else {
-      return Icons.receipt_long_rounded;
     }
+    return Icons.receipt_long_rounded;
   }
 
   @override
   Widget build(BuildContext context) {
-    final color = _isIncome ? const Color(0xFF2EC071) : _red;
+    final color = _isIncome ? _accentMint : _accentRose;
     final amountStr =
         '${_isIncome ? '+' : '-'}₺${_amount.abs().toStringAsFixed(2)}';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _ink.withOpacity(0.05), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: _ink.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: _surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _border),
       ),
       child: Row(
         children: [
           Container(
-            width: 44, height: 44,
+            width: 46,
+            height: 46,
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(15),
             ),
             child: Icon(_icon, color: color, size: 20),
           ),
@@ -520,7 +585,7 @@ class _TransactionTile extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: _ink,
+                    color: _textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -531,9 +596,9 @@ class _TransactionTile extends StatelessWidget {
                     [_category, _date]
                         .where((s) => s.isNotEmpty)
                         .join(' · '),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: _ink.withOpacity(0.4),
+                      color: _textSecondary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -560,6 +625,11 @@ class _TransactionTile extends StatelessWidget {
 class _EmptyTransactions extends StatelessWidget {
   const _EmptyTransactions();
 
+  static const _accentBlue    = Color(0xFF4F8EF7);
+  //static const _border        = Color(0xFF252B3A);
+  static const _textPrimary   = Color(0xFFEEF0F6);
+  static const _textSecondary = Color(0xFF6B7591);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -567,24 +637,26 @@ class _EmptyTransactions extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 72, height: 72,
+            width: 72,
+            height: 72,
             decoration: BoxDecoration(
-              color: const Color(0xFF457B9D).withOpacity(0.08),
+              color: _accentBlue.withOpacity(0.08),
               borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: _accentBlue.withOpacity(0.15)),
             ),
             child: Icon(
               Icons.receipt_long_rounded,
-              size: 36,
-              color: const Color(0xFF457B9D).withOpacity(0.4),
+              size: 32,
+              color: _accentBlue.withOpacity(0.4),
             ),
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'Henüz bir işlem yok',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF0A131F).withOpacity(0.5),
+              color: _textPrimary,
             ),
           ),
           const SizedBox(height: 6),
@@ -593,8 +665,8 @@ class _EmptyTransactions extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
-              color: const Color(0xFF0A131F).withOpacity(0.35),
-              height: 1.5,
+              color: _textSecondary,
+              height: 1.6,
             ),
           ),
         ],
@@ -603,11 +675,15 @@ class _EmptyTransactions extends StatelessWidget {
   }
 }
 
-// ── Hata ekranı ───────────────────────────────────────────────
 class _ErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
   const _ErrorView({required this.message, required this.onRetry});
+
+  static const _accentBlue    = Color(0xFF4F8EF7);
+  static const _accentRose    = Color(0xFFFF5B6E);
+  static const _textPrimary   = Color(0xFFEEF0F6);
+  static const _textSecondary = Color(0xFF6B7591);
 
   @override
   Widget build(BuildContext context) {
@@ -618,15 +694,16 @@ class _ErrorView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 72, height: 72,
+              width: 72,
+              height: 72,
               decoration: BoxDecoration(
-                color: const Color(0xFFE63946).withOpacity(0.1),
+                color: _accentRose.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(24),
+                border:
+                    Border.all(color: _accentRose.withOpacity(0.2)),
               ),
-              child: const Icon(
-                Icons.error_outline_rounded,
-                color: Color(0xFFE63946), size: 36,
-              ),
+              child: const Icon(Icons.error_outline_rounded,
+                  color: _accentRose, size: 32),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -634,31 +711,47 @@ class _ErrorView extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF0A131F),
+                color: _textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
-                color: const Color(0xFF0A131F).withOpacity(0.45),
+                color: _textSecondary,
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded, size: 16),
-              label: const Text('Tekrar Dene'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF457B9D),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+            GestureDetector(
+              onTap: onRetry,
+              child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 12),
+                    horizontal: 24, vertical: 13),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [_accentBlue, Color(0xFF7B6CF6)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.refresh_rounded,
+                        size: 16, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'Tekrar Dene',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -666,26 +759,4 @@ class _ErrorView extends StatelessWidget {
       ),
     );
   }
-}
-
-class _WaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.moveTo(0, size.height);
-    path.quadraticBezierTo(
-      size.width * 0.25, 0,
-      size.width * 0.5, size.height * 0.5,
-    );
-    path.quadraticBezierTo(
-      size.width * 0.75, size.height,
-      size.width, size.height * 0.25,
-    );
-    path.lineTo(size.width, size.height);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(_WaveClipper _) => false;
 }
