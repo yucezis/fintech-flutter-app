@@ -14,15 +14,15 @@ class TransactionsScreen extends ConsumerStatefulWidget {
 class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
     with SingleTickerProviderStateMixin {
   static const _bg         = Color(0xFF0D0F14);       
-  static const _surface    = Color(0xFF161A23);      
+  //static const _surface    = Color(0xFF161A23);      
   static const _surfaceAlt = Color(0xFF1E2330);     
   static const _border     = Color(0xFF252B3A);      
   static const _accentBlue = Color(0xFF4F8EF7);       
-  static const _accentMint = Color(0xFF00C896);     
-  static const _accentRose = Color(0xFFFF5B6E);      
+  //static const _accentMint = Color(0xFF00C896);     
+  //static const _accentRose = Color(0xFFFF5B6E);      
   static const _textPrimary   = Color(0xFFEEF0F6);
   static const _textSecondary = Color(0xFF6B7591);
-  static const _textTertiary  = Color(0xFF3E4660);
+  //static const _textTertiary  = Color(0xFF3E4660);
 
   String _selectedFilter = 'Bu Ay';
   final _filters = ['Tümü', 'Bu Ay', 'Geçen Ay'];
@@ -155,13 +155,13 @@ class _TransactionHero extends StatelessWidget {
   });
 
   static const _bg         = Color(0xFF0D0F14);
-  static const _surface    = Color(0xFF161A23);
+  //static const _surface    = Color(0xFF161A23);
   static const _surfaceAlt = Color(0xFF1E2330);
   static const _border     = Color(0xFF252B3A);
-  static const _accentBlue = Color(0xFF4F8EF7);
+  //static const _accentBlue = Color(0xFF4F8EF7);
   static const _accentMint = Color(0xFF00C896);
   static const _accentRose = Color(0xFFFF5B6E);
-  static const _textPrimary   = Color(0xFFEEF0F6);
+  //static const _textPrimary   = Color(0xFFEEF0F6);
   static const _textSecondary = Color(0xFF6B7591);
 
   @override
@@ -354,9 +354,9 @@ class _FilterBar extends StatelessWidget {
   static const _bg         = Color(0xFF0D0F14);
   static const _surface    = Color(0xFF161A23);
   static const _border     = Color(0xFF252B3A);
-  static const _accentBlue = Color(0xFF4F8EF7);
+  //static const _accentBlue = Color(0xFF4F8EF7);
   static const _textSecondary = Color(0xFF6B7591);
-  static const _textPrimary   = Color(0xFFEEF0F6);
+  //static const _textPrimary   = Color(0xFFEEF0F6);
 
   @override
   Widget build(BuildContext context) {
@@ -451,7 +451,7 @@ class _DateHeader extends StatelessWidget {
 
   static const _textSecondary = Color(0xFF6B7591);
   static const _textTertiary  = Color(0xFF3E4660);
-  static const _accentBlue    = Color(0xFF4F8EF7);
+  //static const _accentBlue    = Color(0xFF4F8EF7);
 
   String get _display {
     final now = DateTime.now();
@@ -619,7 +619,7 @@ class _TransactionTile extends StatelessWidget {
 class _EmptyState extends StatelessWidget {
   const _EmptyState();
 
-  static const _surfaceAlt    = Color(0xFF1E2330);
+  //static const _surfaceAlt    = Color(0xFF1E2330);
   static const _accentBlue    = Color(0xFF4F8EF7);
   static const _textPrimary   = Color(0xFFEEF0F6);
   static const _textSecondary = Color(0xFF6B7591);
@@ -676,9 +676,9 @@ class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.message, required this.onRetry});
 
   static const _accentRose    = Color(0xFFFF5B6E);
-  static const _accentBlue    = Color(0xFF4F8EF7);
-  static const _surface       = Color(0xFF161A23);
-  static const _border        = Color(0xFF252B3A);
+  //static const _accentBlue    = Color(0xFF4F8EF7);
+  //static const _surface       = Color(0xFF161A23);
+  //static const _border        = Color(0xFF252B3A);
   static const _textPrimary   = Color(0xFFEEF0F6);
   static const _textSecondary = Color(0xFF6B7591);
 
