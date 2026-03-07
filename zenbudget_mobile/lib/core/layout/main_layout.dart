@@ -7,7 +7,7 @@ class _C {
   static const cerulean = Color(0xFF457B9D);
   static const frost    = Color(0xFFA8DADC);
   static const ink      = Color(0xFF0A131F);
-  static const cream    = Color(0xFFF1FAEE);
+  //static const cream    = Color(0xFFF1FAEE);
 }
 
 class MainLayout extends StatelessWidget {

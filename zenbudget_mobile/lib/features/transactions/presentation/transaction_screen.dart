@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/transaction_provider.dart';
 import '../data/transaction_model.dart';
+import 'add_transaction_sheet.dart';
 
 class TransactionsScreen extends ConsumerStatefulWidget {
   const TransactionsScreen({super.key});
@@ -13,16 +14,12 @@ class TransactionsScreen extends ConsumerStatefulWidget {
 
 class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
     with SingleTickerProviderStateMixin {
-  static const _bg         = Color(0xFF0D0F14);       
-  //static const _surface    = Color(0xFF161A23);      
-  static const _surfaceAlt = Color(0xFF1E2330);     
-  static const _border     = Color(0xFF252B3A);      
-  static const _accentBlue = Color(0xFF4F8EF7);       
-  //static const _accentMint = Color(0xFF00C896);     
-  //static const _accentRose = Color(0xFFFF5B6E);      
+  static const _bg         = Color(0xFF0D0F14);
+  static const _surfaceAlt = Color(0xFF1E2330);
+  static const _border     = Color(0xFF252B3A);
+  static const _accentBlue = Color(0xFF4F8EF7);
   static const _textPrimary   = Color(0xFFEEF0F6);
   static const _textSecondary = Color(0xFF6B7591);
-  //static const _textTertiary  = Color(0xFF3E4660);
 
   String _selectedFilter = 'Bu Ay';
   final _filters = ['Tümü', 'Bu Ay', 'Geçen Ay'];
@@ -55,6 +52,17 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
     return (income: income, expense: expense);
   }
 
+  void _showAddTransactionSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => AddTransactionSheet(
+        onSaved: () => ref.refresh(transactionsProvider.future),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final transactionsAsync = ref.watch(transactionsProvider);
@@ -62,6 +70,14 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
 
     return Scaffold(
       backgroundColor: _bg,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddTransactionSheet(context),
+        backgroundColor: _accentBlue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Icon(Icons.add_rounded, color: Colors.white),
+      ),
       body: transactionsAsync.when(
         loading: () => const Center(
             child: CircularProgressIndicator(color: _accentBlue)),
@@ -143,6 +159,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
   }
 }
 
+
 class _TransactionHero extends StatelessWidget {
   final String filter;
   final double income;
@@ -155,13 +172,10 @@ class _TransactionHero extends StatelessWidget {
   });
 
   static const _bg         = Color(0xFF0D0F14);
-  //static const _surface    = Color(0xFF161A23);
   static const _surfaceAlt = Color(0xFF1E2330);
   static const _border     = Color(0xFF252B3A);
-  //static const _accentBlue = Color(0xFF4F8EF7);
   static const _accentMint = Color(0xFF00C896);
   static const _accentRose = Color(0xFFFF5B6E);
-  //static const _textPrimary   = Color(0xFFEEF0F6);
   static const _textSecondary = Color(0xFF6B7591);
 
   @override
@@ -185,8 +199,7 @@ class _TransactionHero extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    (isPositive ? _accentMint : _accentRose)
-                        .withOpacity(0.15),
+                    (isPositive ? _accentMint : _accentRose).withOpacity(0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -220,8 +233,7 @@ class _TransactionHero extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                 decoration: BoxDecoration(
                   color: _surfaceAlt,
                   borderRadius: BorderRadius.circular(20),
@@ -270,6 +282,7 @@ class _TransactionHero extends StatelessWidget {
     );
   }
 }
+
 
 class _SummaryCard extends StatelessWidget {
   final String label;
@@ -340,6 +353,7 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
+
 class _FilterBar extends StatelessWidget {
   final List<String> filters;
   final String selected;
@@ -351,12 +365,10 @@ class _FilterBar extends StatelessWidget {
     required this.onSelected,
   });
 
-  static const _bg         = Color(0xFF0D0F14);
-  static const _surface    = Color(0xFF161A23);
-  static const _border     = Color(0xFF252B3A);
-  //static const _accentBlue = Color(0xFF4F8EF7);
+  static const _bg            = Color(0xFF0D0F14);
+  static const _surface       = Color(0xFF161A23);
+  static const _border        = Color(0xFF252B3A);
   static const _textSecondary = Color(0xFF6B7591);
-  //static const _textPrimary   = Color(0xFFEEF0F6);
 
   @override
   Widget build(BuildContext context) {
@@ -372,8 +384,7 @@ class _FilterBar extends StatelessWidget {
               onTap: () => onSelected(f),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   gradient: isSelected
                       ? const LinearGradient(
@@ -385,20 +396,15 @@ class _FilterBar extends StatelessWidget {
                   color: isSelected ? null : _surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color:
-                        isSelected ? Colors.transparent : _border,
+                    color: isSelected ? Colors.transparent : _border,
                   ),
                 ),
                 child: Text(
                   f,
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight: isSelected
-                        ? FontWeight.w700
-                        : FontWeight.w500,
-                    color: isSelected
-                        ? Colors.white
-                        : _textSecondary,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected ? Colors.white : _textSecondary,
                   ),
                 ),
               ),
@@ -409,6 +415,10 @@ class _FilterBar extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────
+// Transaction Sliver (grouped by date)
+// ─────────────────────────────────────────────
 
 class _TransactionSliver extends StatelessWidget {
   final List<TransactionModel> transactions;
@@ -445,13 +455,13 @@ class _TransactionSliver extends StatelessWidget {
   }
 }
 
+
 class _DateHeader extends StatelessWidget {
   final String label;
   const _DateHeader({required this.label});
 
   static const _textSecondary = Color(0xFF6B7591);
   static const _textTertiary  = Color(0xFF3E4660);
-  //static const _accentBlue    = Color(0xFF4F8EF7);
 
   String get _display {
     final now = DateTime.now();
@@ -507,26 +517,20 @@ class _TransactionTile extends StatelessWidget {
 
   IconData get _icon {
     final cat = (tx.categoryName ?? '').toLowerCase();
-    if (cat.contains('yemek') ||
-        cat.contains('food') ||
-        cat.contains('restoran')) return Icons.restaurant_rounded;
-    if (cat.contains('ulaşım') ||
-        cat.contains('transport') ||
-        cat.contains('araba')) return Icons.directions_car_rounded;
-    if (cat.contains('alışveriş') ||
-        cat.contains('shop') ||
-        cat.contains('market')) return Icons.shopping_bag_rounded;
-    if (cat.contains('sağlık') ||
-        cat.contains('health') ||
-        cat.contains('ilaç')) return Icons.favorite_rounded;
-    if (cat.contains('eğitim') ||
-        cat.contains('education') ||
-        cat.contains('kurs')) return Icons.school_rounded;
-    if (cat.contains('eğlence') ||
-        cat.contains('entertainment')) return Icons.movie_rounded;
-    if (cat.contains('fatura') ||
-        cat.contains('bill') ||
-        cat.contains('elektrik')) return Icons.receipt_rounded;
+    if (cat.contains('yemek') || cat.contains('food') || cat.contains('restoran'))
+      return Icons.restaurant_rounded;
+    if (cat.contains('ulaşım') || cat.contains('transport') || cat.contains('araba'))
+      return Icons.directions_car_rounded;
+    if (cat.contains('alışveriş') || cat.contains('shop') || cat.contains('market'))
+      return Icons.shopping_bag_rounded;
+    if (cat.contains('sağlık') || cat.contains('health') || cat.contains('ilaç'))
+      return Icons.favorite_rounded;
+    if (cat.contains('eğitim') || cat.contains('education') || cat.contains('kurs'))
+      return Icons.school_rounded;
+    if (cat.contains('eğlence') || cat.contains('entertainment'))
+      return Icons.movie_rounded;
+    if (cat.contains('fatura') || cat.contains('bill') || cat.contains('elektrik'))
+      return Icons.receipt_rounded;
     if (_isIncome) return Icons.account_balance_rounded;
     return Icons.receipt_long_rounded;
   }
@@ -575,9 +579,7 @@ class _TransactionTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  tx.description.isNotEmpty
-                      ? tx.description
-                      : timeStr,
+                  tx.description.isNotEmpty ? tx.description : timeStr,
                   style: const TextStyle(
                     fontSize: 12,
                     color: _textSecondary,
@@ -616,10 +618,13 @@ class _TransactionTile extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────
+// Empty State
+// ─────────────────────────────────────────────
+
 class _EmptyState extends StatelessWidget {
   const _EmptyState();
 
-  //static const _surfaceAlt    = Color(0xFF1E2330);
   static const _accentBlue    = Color(0xFF4F8EF7);
   static const _textPrimary   = Color(0xFFEEF0F6);
   static const _textSecondary = Color(0xFF6B7591);
@@ -636,8 +641,7 @@ class _EmptyState extends StatelessWidget {
             decoration: BoxDecoration(
               color: _accentBlue.withOpacity(0.08),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                  color: _accentBlue.withOpacity(0.15)),
+              border: Border.all(color: _accentBlue.withOpacity(0.15)),
             ),
             child: Icon(
               Icons.receipt_long_rounded,
@@ -670,15 +674,13 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
+
 class _ErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
   const _ErrorView({required this.message, required this.onRetry});
 
   static const _accentRose    = Color(0xFFFF5B6E);
-  //static const _accentBlue    = Color(0xFF4F8EF7);
-  //static const _surface       = Color(0xFF161A23);
-  //static const _border        = Color(0xFF252B3A);
   static const _textPrimary   = Color(0xFFEEF0F6);
   static const _textSecondary = Color(0xFF6B7591);
 
@@ -696,8 +698,7 @@ class _ErrorView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: _accentRose.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                    color: _accentRose.withOpacity(0.2)),
+                border: Border.all(color: _accentRose.withOpacity(0.2)),
               ),
               child: const Icon(Icons.error_outline_rounded,
                   color: _accentRose, size: 32),
@@ -736,8 +737,7 @@ class _ErrorView extends StatelessWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.refresh_rounded,
-                        size: 16, color: Colors.white),
+                    Icon(Icons.refresh_rounded, size: 16, color: Colors.white),
                     SizedBox(width: 8),
                     Text(
                       'Tekrar Dene',
