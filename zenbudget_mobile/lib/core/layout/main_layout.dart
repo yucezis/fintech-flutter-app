@@ -10,10 +10,6 @@ class _C {
   static const cream    = Color(0xFFF1FAEE);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  MAIN LAYOUT  — nav bar is a Stack overlay, NOT bottomNavigationBar slot
-//  This avoids the MediaQuery rebuild loop that causes ANR on tab switch.
-// ─────────────────────────────────────────────────────────────────────────────
 class MainLayout extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
@@ -21,14 +17,10 @@ class MainLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-    // Nav bar total height: 72px bar + 20px margin + system bottom padding
-    final navBarHeight = 72.0 + 20.0 + bottomPadding;
+    final bottomPadding = MediaQuery.paddingOf(context).bottom;
 
-    // GoRouter index (0-3) -> UI Index (0-4) dönüşümü
     int getUINavIndex() {
       final branchIndex = navigationShell.currentIndex;
-      // Eğer branch index 2 veya büyükse (AI veya Profil), UI'da bir sağa kaydır (Ekle butonunu atla)
       return branchIndex >= 2 ? branchIndex + 1 : branchIndex;
     }
 
@@ -36,13 +28,10 @@ class MainLayout extends StatelessWidget {
       HapticFeedback.lightImpact();
 
       if (uiIndex == 2) {
-        // 🚨 Ortadaki "Ekle" butonuna tıklandı!
-        // Burada goBranch YERİNE bir modal veya bottom sheet açılmalı.
         print("Ekle aksiyonu tetiklendi");
         return; 
       }
 
-      // UI Index (0-4) -> GoRouter index (0-3) dönüşümü
       final branchIndex = uiIndex > 2 ? uiIndex - 1 : uiIndex;
 
       navigationShell.goBranch(
@@ -52,17 +41,13 @@ class MainLayout extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: _C.cream,
-      // No extendBody, no bottomNavigationBar slot — clean Scaffold
+      backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // Page content — padded so it doesn't hide behind the nav bar
           Positioned.fill(
-            bottom: navBarHeight,
             child: navigationShell,
           ),
-
-          // Floating nav bar pinned to bottom
           Positioned(
             left: 0,
             right: 0,
@@ -79,9 +64,6 @@ class MainLayout extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  FLOATING NAV
-// ─────────────────────────────────────────────────────────────────────────────
 class _FloatingNav extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -248,7 +230,7 @@ class _FloatingNavState extends State<_FloatingNav>
               const SizedBox(height: 3),
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutBack,
+                curve: Curves.easeOut,
                 width:  active ? 4 : 0,
                 height: active ? 4 : 0,
                 decoration: const BoxDecoration(
@@ -315,9 +297,6 @@ class _FloatingNavState extends State<_FloatingNav>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  DATA
-// ─────────────────────────────────────────────────────────────────────────────
 class _NavItem {
   final IconData icon;
   final IconData activeIcon;

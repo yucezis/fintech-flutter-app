@@ -21,6 +21,7 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print("🚨 DashboardScreen çizildi!");
     final dashboardAsync = ref.watch(dashboardProvider);
 
     return Scaffold(
