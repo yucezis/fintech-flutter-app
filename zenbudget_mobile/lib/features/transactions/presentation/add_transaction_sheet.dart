@@ -29,6 +29,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
 
   bool _isIncome = false;
   bool _isLoading = false;
+  bool _isCategoriesLoading = true; // Kategorilerin yüklenme durumunu takip etmek için
   String? _selectedCategoryId;
   List<CategoryModel> _categories = [];
 
@@ -39,16 +40,38 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   }
 
   Future<void> _loadCategories() async {
-    final cats = await CategoryService().getCategories(
-      type: _isIncome ? 'income' : 'expense',
-    );
-    setState(() => _categories = cats);
+    setState(() => _isCategoriesLoading = true);
+    try {
+      final cats = await CategoryService().getCategories(
+        type: _isIncome ? '1' : '2',
+      );
+      setState(() {
+        _categories = cats;
+        // Eğer seçili kategori ID'si yeni gelen listede yoksa null yap (hata almamak için)
+        if (!cats.any((c) => c.id == _selectedCategoryId)) {
+          _selectedCategoryId = null;
+        }
+      });
+    } finally {
+      setState(() => _isCategoriesLoading = false);
+    }
   }
 
   Future<void> _save() async {
     if (_amountController.text.isEmpty || _selectedCategoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen tutar ve kategori seç')),
+        const SnackBar(content: Text('Lütfen tutar ve kategori seçin')),
+      );
+      return;
+    }
+
+    // 🚨 VİRGÜL/NOKTA HATASI ÇÖZÜMÜ: Virgülleri noktaya çevirip güvenli parse ediyoruz
+    String sanitizedAmount = _amountController.text.replaceAll(',', '.');
+    double? parsedAmount = double.tryParse(sanitizedAmount);
+
+    if (parsedAmount == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lütfen geçerli bir tutar girin')),
       );
       return;
     }
@@ -59,10 +82,10 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         TransactionModel(
           id: '',  
           categoryId: _selectedCategoryId!,
-          amount: double.parse(_amountController.text),
+          amount: parsedAmount,
           description: _descriptionController.text,
           date: DateTime.now(),
-          type: _isIncome ? '0' : '1',
+          type: _isIncome ? '1' : '2',
         ),
       );
       widget.onSaved();
@@ -74,7 +97,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         );
       }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -82,153 +107,170 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(24, 20, 24, 24 + bottomPadding),
-      decoration: const BoxDecoration(
-        color: _bg,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: Container(
-              width: 40, height: 4,
+    // BottomSheet içeriklerinin gestures/tap olaylarını doğru algılaması için Material ile sarıyoruz
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        padding: EdgeInsets.fromLTRB(24, 20, 24, 24 + bottomPadding),
+        decoration: const BoxDecoration(
+          color: _bg,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40, height: 4,
+                decoration: BoxDecoration(
+                  color: _border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            const Text(
+              'Yeni İşlem',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: _textPrimary,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            Container(
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: _border,
-                borderRadius: BorderRadius.circular(2),
+                color: _surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: _border),
+              ),
+              child: Row(
+                children: [
+                  _ToggleButton(
+                    label: 'Gider',
+                    icon: Icons.arrow_upward_rounded,
+                    isSelected: !_isIncome,
+                    color: _accentRose,
+                    onTap: () {
+                      if (!_isIncome) return; // Zaten giderdeyse tekrar API'ye istek atma
+                      setState(() {
+                        _isIncome = false;
+                        _selectedCategoryId = null;
+                      });
+                      _loadCategories();
+                    },
+                  ),
+                  _ToggleButton(
+                    label: 'Gelir',
+                    icon: Icons.arrow_downward_rounded,
+                    isSelected: _isIncome,
+                    color: _accentMint,
+                    onTap: () {
+                      if (_isIncome) return; // Zaten gelirdeyse tekrar API'ye istek atma
+                      setState(() {
+                        _isIncome = true;
+                        _selectedCategoryId = null;
+                      });
+                      _loadCategories();
+                    },
+                  ),
+                ],
               ),
             ),
-          ),
-          const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
-          const Text(
-            'Yeni İşlem',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: _textPrimary,
+            _InputField(
+              controller: _amountController,
+              label: 'Tutar (₺)',
+              keyboardType: const TextInputType.numberWithOptions(decimal: true), // Virgül/nokta klavyesi
+              prefix: '₺',
             ),
-          ),
-          const SizedBox(height: 20),
+            const SizedBox(height: 12),
 
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: _surface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _border),
+            _InputField(
+              controller: _descriptionController,
+              label: 'Açıklama (opsiyonel)',
             ),
-            child: Row(
-              children: [
-                _ToggleButton(
-                  label: 'Gider',
-                  icon: Icons.arrow_upward_rounded,
-                  isSelected: !_isIncome,
-                  color: _accentRose,
-                  onTap: () {
-                    setState(() {
-                      _isIncome = false;
-                      _selectedCategoryId = null;
-                    });
-                    _loadCategories();
-                  },
-                ),
-                _ToggleButton(
-                  label: 'Gelir',
-                  icon: Icons.arrow_downward_rounded,
-                  isSelected: _isIncome,
-                  color: _accentMint,
-                  onTap: () {
-                    setState(() {
-                      _isIncome = true;
-                      _selectedCategoryId = null;
-                    });
-                    _loadCategories();
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
-          _InputField(
-            controller: _amountController,
-            label: 'Tutar (₺)',
-            keyboardType: TextInputType.number,
-            prefix: '₺',
-          ),
-          const SizedBox(height: 12),
-
-          _InputField(
-            controller: _descriptionController,
-            label: 'Açıklama (opsiyonel)',
-          ),
-          const SizedBox(height: 12),
-
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            decoration: BoxDecoration(
-              color: _surface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _border),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedCategoryId,
-                hint: Text(
-                  'Kategori seç',
-                  style: TextStyle(color: _textSecondary, fontSize: 14),
-                ),
-                dropdownColor: _surface,
-                style: const TextStyle(color: _textPrimary, fontSize: 14),
-                isExpanded: true,
-                items: _categories.map((cat) {
-                  return DropdownMenuItem(
-                    value: cat.id,
-                    child: Text(cat.name),
-                  );
-                }).toList(),
-                onChanged: (v) => setState(() => _selectedCategoryId = v),
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          GestureDetector(
-            onTap: _isLoading ? null : _save,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF4F8EF7), Color(0xFF7B6CF6)],
-                ),
-                borderRadius: BorderRadius.circular(16),
+                color: _surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: _border),
               ),
-              child: Center(
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 20, height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2),
-                      )
-                    : const Text(
-                        'Kaydet',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
+              child: _isCategoriesLoading 
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Text('Kategoriler yükleniyor...', style: TextStyle(color: _textSecondary, fontSize: 14)),
+                  )
+                : _categories.isEmpty 
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Text('Bu işlem tipi için kategori bulunamadı', style: TextStyle(color: _accentRose, fontSize: 14)),
+                    )
+                  : DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedCategoryId,
+                        hint: const Text(
+                          'Kategori seç',
+                          style: TextStyle(color: _textSecondary, fontSize: 14),
                         ),
+                        dropdownColor: _surface,
+                        style: const TextStyle(color: _textPrimary, fontSize: 14),
+                        isExpanded: true,
+                        items: _categories.map((cat) {
+                          return DropdownMenuItem(
+                            value: cat.id.toString(), // Tip uyuşmazlığını engellemek için toString garantiye alır
+                            child: Text(cat.name),
+                          );
+                        }).toList(),
+                        onChanged: (v) => setState(() => _selectedCategoryId = v),
                       ),
+                    ),
+            ),
+            const SizedBox(height: 24),
+
+            GestureDetector(
+              onTap: _isLoading ? null : _save,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4F8EF7), Color(0xFF7B6CF6)],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20, height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Text(
+                          'Kaydet',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
+                        ),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
+
 
 class _ToggleButton extends StatelessWidget {
   final String label;
