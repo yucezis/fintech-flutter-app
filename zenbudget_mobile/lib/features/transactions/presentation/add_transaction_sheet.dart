@@ -47,7 +47,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       );
       setState(() {
         _categories = cats;
-        // Eğer seçili kategori ID'si yeni gelen listede yoksa null yap (hata almamak için)
         if (!cats.any((c) => c.id == _selectedCategoryId)) {
           _selectedCategoryId = null;
         }
@@ -65,7 +64,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
       return;
     }
 
-    // 🚨 VİRGÜL/NOKTA HATASI ÇÖZÜMÜ: Virgülleri noktaya çevirip güvenli parse ediyoruz
     String sanitizedAmount = _amountController.text.replaceAll(',', '.');
     double? parsedAmount = double.tryParse(sanitizedAmount);
 
@@ -107,7 +105,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
-    // BottomSheet içeriklerinin gestures/tap olaylarını doğru algılaması için Material ile sarıyoruz
     return Material(
       color: Colors.transparent,
       child: Container(
@@ -132,7 +129,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
             const SizedBox(height: 20),
 
             const Text(
-              'Yeni İşlem',
+              'Gelir/Gider Ekleme',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -152,11 +149,11 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 children: [
                   _ToggleButton(
                     label: 'Gider',
-                    icon: Icons.arrow_upward_rounded,
+                    icon: Icons.arrow_downward_rounded,
                     isSelected: !_isIncome,
                     color: _accentRose,
                     onTap: () {
-                      if (!_isIncome) return; // Zaten giderdeyse tekrar API'ye istek atma
+                      if (!_isIncome) return;
                       setState(() {
                         _isIncome = false;
                         _selectedCategoryId = null;
@@ -166,11 +163,11 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                   ),
                   _ToggleButton(
                     label: 'Gelir',
-                    icon: Icons.arrow_downward_rounded,
+                    icon: Icons.arrow_upward_rounded,
                     isSelected: _isIncome,
                     color: _accentMint,
                     onTap: () {
-                      if (_isIncome) return; // Zaten gelirdeyse tekrar API'ye istek atma
+                      if (_isIncome) return; 
                       setState(() {
                         _isIncome = true;
                         _selectedCategoryId = null;
@@ -186,7 +183,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
             _InputField(
               controller: _amountController,
               label: 'Tutar (₺)',
-              keyboardType: const TextInputType.numberWithOptions(decimal: true), // Virgül/nokta klavyesi
+              keyboardType: const TextInputType.numberWithOptions(decimal: true), 
               prefix: '₺',
             ),
             const SizedBox(height: 12),

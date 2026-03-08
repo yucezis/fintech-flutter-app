@@ -56,6 +56,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       builder: (_) => AddTransactionSheet(
         onSaved: () => ref.refresh(transactionsProvider.future),
@@ -70,14 +71,18 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen>
 
     return Scaffold(
       backgroundColor: _bg,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddTransactionSheet(context),
-        backgroundColor: _accentBlue,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Icon(Icons.add_rounded, color: Colors.white),
-      ),
+      floatingActionButton: Padding(
+  padding: const EdgeInsets.only(bottom: 75),
+  child: FloatingActionButton(
+    onPressed: () => _showAddTransactionSheet(context),
+    backgroundColor: _accentBlue,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: const Icon(Icons.add_rounded, color: Colors.white),
+  ),
+),
+floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: transactionsAsync.when(
         loading: () => const Center(
             child: CircularProgressIndicator(color: _accentBlue)),
