@@ -4,7 +4,6 @@ import '../data/transaction_model.dart';
 import '../data/transaction_service.dart';
 import '../../categories/data/category_service.dart';
 import '../../categories/data/category_model.dart';
-import '../../../core/utils/auth_utils.dart';
 
 class AddTransactionSheet extends ConsumerStatefulWidget {
   final VoidCallback onSaved;
@@ -56,8 +55,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
 
     setState(() => _isLoading = true);
     try {
-      final userId = await AuthUtils.getUserId() ?? '';
-
       await TransactionService().addTransaction(
         TransactionModel(
           id: '',  

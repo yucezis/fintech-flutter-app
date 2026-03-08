@@ -6,35 +6,38 @@ import 'transaction_model.dart';
 class TransactionService {
   final Dio _dio = DioClient.createDio();
 
-  // Tüm işlemleri getir
   Future<List<TransactionModel>> getTransactions() async {
     try {
-      final response = await _dio.get('${ApiConstants.baseUrl}/api/v1/transactions');
+      final response = await _dio.get('${ApiConstants.baseUrl}/transactions');
+      print('DEBUG - İstek URL: ${ApiConstants.baseUrl}/transactions');
       
-      // Ajanlarımızı yerleştiriyoruz ki backend'in tam olarak ne döndüğünü görelim
       print('DEBUG - Backendden Gelen Veri Tipi: ${response.data.runtimeType}');
       print('DEBUG - Backendden Gelen Veri: ${response.data}');
 
       List<dynamic> dataList = [];
 
-      // 1. Senaryo: Backend direkt liste dönüyorsa -> [ {...}, {...} ]
       if (response.data is List) {
         dataList = response.data;
-      } 
-      // 2. Senaryo: Backend objenin içinde sarılı dönüyorsa -> { "data": [...] } veya { "items": [...] }
-      else if (response.data is Map) {
+      } else if (response.data is Map) {
         final mapData = response.data as Map<String, dynamic>;
         
         if (mapData.containsKey('data') && mapData['data'] is List) {
-          dataList = mapData['data'];
-        } else if (mapData.containsKey('items') && mapData['items'] is List) {
-          dataList = mapData['items'];
-        } else if (mapData.containsKey('\$values') && mapData['\$values'] is List) {
-          dataList = mapData['\$values'];
-        } else {
-          print('🔴 HATA: Obje geldi ama içinde liste bulunamadı! Anahtarlar: ${mapData.keys}');
-          return []; // Çökmeyi engellemek için boş liste dön
-        }
+  dataList = mapData['data'];
+} else if (mapData.containsKey('data') && mapData['data'] is Map) {
+  // data bir obje, içinde items veya $values olabilir
+  final dataObj = mapData['data'] as Map<String, dynamic>;
+  if (dataObj.containsKey('items') && dataObj['items'] is List) {
+    dataList = dataObj['items'];
+  } else if (dataObj.containsKey('\$values') && dataObj['\$values'] is List) {
+    dataList = dataObj['\$values'];
+  } else if (dataObj.containsKey('transactions') && dataObj['transactions'] is List) {
+    dataList = dataObj['transactions'];
+  } else {
+    // data'nın tam içeriğini görelim
+    print('🔴 data objesi içeriği: ${dataObj.keys}');
+    return [];
+  }
+}
       }
 
       return dataList.map((json) => TransactionModel.fromJson(json)).toList();
@@ -47,7 +50,7 @@ class TransactionService {
   Future<bool> addTransaction(TransactionModel transaction) async {
     try {
       await _dio.post(
-        '${ApiConstants.baseUrl}/api/v1/transactions',
+        '${ApiConstants.baseUrl}/transactions',
         data: transaction.toJson(),
       );
       return true;
@@ -59,7 +62,7 @@ class TransactionService {
 
   Future<bool> deleteTransaction(String id) async {
     try {
-      await _dio.delete('${ApiConstants.baseUrl}/api/v1/transactions/$id');
+      await _dio.delete('${ApiConstants.baseUrl}/transactions/$id');
       return true;
     } catch (e) {
       print('🔴 İŞLEM SİLİNİRKEN HATA: $e');
