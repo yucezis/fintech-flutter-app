@@ -18,6 +18,10 @@
 
 ---
 
+> 💡 **Note:** This repository contains the Flutter mobile client for **ZenBudget**. The application is powered by a robust .NET API built with Clean Architecture. If you are looking for the backend source code, please visit the [ZenBudget Backend Repository](https://github.com/yucezis/fintech-dotnet-backend).
+
+---
+
 ## Table of Contents
 
 - [About](#about)
@@ -328,3 +332,4 @@ This project is licensed under the [MIT License](LICENSE).
 <p align="center">
   ZenBudget Mobile — Financial peace, in your pocket 💙
 </p>
+
